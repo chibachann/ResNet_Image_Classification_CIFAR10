@@ -25,5 +25,19 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
 # その他必要なPythonライブラリのインストール
 RUN pip install matplotlib numpy pandas scikit-learn
 
+# Jupyter Notebookのインストール
+RUN pip install notebook
+
+# Jupyter Notebookの設定（オプション）
+RUN jupyter notebook --generate-config --allow-root && \
+    echo "c.NotebookApp.token = ''" >> /root/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.password = ''" >> /root/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.allow_root = True" >> /root/.jupyter/jupyter_notebook_config.py
+
+
 # 作業ディレクトリの設定
 WORKDIR /work
+
+# Jupyter Notebookの起動
+CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
