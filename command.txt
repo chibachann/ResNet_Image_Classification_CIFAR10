@@ -1,0 +1,6 @@
+ビルド時
+docker build . -t my-jupyter
+
+実行時
+docker run -it --rm --gpus all -v .:/work -p 8888:8888 my-jupyter sh -c "jupyter-lab --allow-root --ip=0.0.0.0"
+

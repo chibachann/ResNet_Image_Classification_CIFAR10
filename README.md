@@ -1,46 +1,35 @@
-# Docker環境の説明
 
-## **基本情報**
+# 環境の立ち上げについてのReadMe（日本語）
 
-- **Base Image**: NVIDIA CUDA 11.8.0 開発環境、Ubuntu 22.04ベース
-- **目的**: CIFAR-10データセットに対する画像分類タスクの実行
-- **使用技術**: PyTorch
+## Dockerイメージのビルド
+1. まず、`Dockerfile`が配置されているディレクトリに移動してください。
+2. 次のコマンドを実行して、Dockerイメージをビルドします。
 
-## **環境構築**
+   ```bash
+   docker build . -t my-jupyter
+   ```
+   
+   - このコマンドは、現在のディレクトリ（`.`）の`Dockerfile`を基にして、`my-jupyter`という名前のDockerイメージを作成します。
 
-1. Docker Imageのビルド
-    ```bash
-    docker build -t image_classification_env .
-    ```
+## Dockerコンテナの実行
+1. Dockerイメージがビルドされたら、次のコマンドを実行してコンテナを起動します。
 
-2. Docker Containerの起動
-    ```bash
-    docker run --gpus all -it --rm image_classification_env
-    ```
+   ```bash
+   docker run -it --rm --gpus all -v .:/work -p 8888:8888 my-jupyter sh -c "jupyter-lab --allow-root --ip=0.0.0.0"
+   ```
 
-## **インストール済みパッケージ**
+   - `-it`：コンテナが対話モードで実行されるようにします。
+   - `--rm`：コンテナの実行が終了したら自動的に削除されるようにします。
+   - `--gpus all`：ホストマシンのすべてのGPUをコンテナに利用可能にします。
+   - `-v .:/work`：ホストマシンの現在のディレクトリを、コンテナの`/work`ディレクトリにマウントします。
+   - `-p 8888:8888`：ホストマシンの8888ポートを、コンテナの8888ポートにフォワードします。
+   - `sh -c "jupyter-lab --allow-root --ip=0.0.0.0"`：コンテナ内でJupyter Labを起動するコマンドです。
 
-- **システムパッケージ**
-  - Python 3.9
-  - wget
-  - その他依存関係
+2. コンテナが正常に起動すると、ブラウザで`http://localhost:8888`にアクセスしてJupyter Labを使用できます。
 
-- **Pythonライブラリ**
-  - torch, torchvision, torchaudio
-  - matplotlib
-  - numpy
-  - pandas
-  - scikit-learn
-
-## **作業ディレクトリ**
-
-- `/work`
-
-## **使用方法**
-
-- Docker Container内の`/work`ディレクトリで作業を行います。
-- 必要に応じて追加のPythonライブラリをインストールしてカスタマイズが可能です。
-
-## **注意事項**
-
-- Docker ContainerはGPUを利用する設定になっています。GPUがない環境では`--gpus all`オプションを削除してください。
+## Dockerfileの詳細
+- `FROM nvcr.io/nvidia/cuda:11.8.0-devel-ubuntu22.04`：CUDA 11.8.0を基にしたUbuntu 22.04のイメージを使用します。
+- タイムゾーンは非対話モードで設定されます。
+- 必要なPythonパッケージは、`requirements.txt`からインストールされます。
+- Python 3.9がインストールされ、デフォルトのPythonバージョンとして設定されます。
+- 作業ディレクトリは`/work`に設定されます。
